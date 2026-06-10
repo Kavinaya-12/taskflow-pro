@@ -32,6 +32,7 @@ Backend:
 * Bcrypt.js
 
 Deployment :
+
 Frontend :
 Deployed on Vercel
 
