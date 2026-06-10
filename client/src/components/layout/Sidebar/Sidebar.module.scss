@@ -1,0 +1,101 @@
+@import "../../../styles/abstracts/variables";
+@import "../../../styles/abstracts/mixins";
+
+.sidebar {
+  width: 260px;
+  height: calc(100vh - 40px);
+
+  padding: 30px 20px;
+
+  position: fixed;
+
+  top: 20px;
+  left: 20px;
+
+  @include glassCard;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.logo {
+  width: 70px;
+  height: 70px;
+
+  border-radius: 20px;
+
+  background: linear-gradient(135deg, #C78DFF, #8F4FFF);
+
+  @include flexCenter;
+
+  font-size: 1.8rem;
+
+  margin-bottom: 50px;
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* buttons inside menu use consistent readable color */
+.menu button {
+  color: rgba(255,255,255,.75);
+  font-weight: 500;
+
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: transparent;
+  border: none;
+  padding: 0 18px;
+
+  svg {
+    color: rgba(255,255,255,.75);
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+}
+
+.item {
+  height: 56px;
+
+  border-radius: 16px;
+
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  padding: 0 18px;
+
+  color: var(--text-muted);
+
+  cursor: pointer;
+
+  transition: .3s ease;
+
+  svg {
+    font-size: 1.2rem;
+  }
+
+  &:hover {
+    background: rgba(255,255,255,.05);
+
+    color: white;
+
+    transform: translateX(4px);
+  }
+}
+
+.active {
+  background: linear-gradient(135deg, #C78DFF, #8F4FFF);
+
+  color: white !important;
+
+  box-shadow: 0 10px 25px rgba(157,92,255,.28);
+
+  svg {
+    color: white !important;
+  }
+}

@@ -1,0 +1,159 @@
+@import "../../styles/abstracts/variables";
+@import "../../styles/abstracts/mixins";
+
+.loginCard {
+  width: 430px;
+  padding: 45px;
+
+  position: relative;
+  z-index: 2;
+
+  @include glassCard;
+
+  text-align: center;
+}
+
+.logoSection {
+  margin-bottom: 35px;
+
+  .logoIcon {
+    width: 85px;
+    height: 85px;
+
+    margin: auto;
+    margin-bottom: 20px;
+
+    border-radius: 24px;
+
+    background: linear-gradient(
+      135deg,
+      #C78DFF,
+      #8F4FFF
+    );
+
+    @include flexCenter;
+
+    font-size: 2rem;
+
+    box-shadow:
+      0 10px 30px rgba(150,80,255,.35);
+  }
+
+  h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 10px;
+
+    span {
+      color: $primary-purple;
+    }
+  }
+
+  p {
+    color: $text-muted;
+    font-size: 0.95rem;
+  }
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.inputGroup {
+  position: relative;
+
+  .icon {
+    position: absolute;
+
+    left: 18px;
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    color: $text-muted;
+    font-size: 1.1rem;
+  }
+
+  input {
+    width: 100%;
+    height: 58px;
+
+    padding-left: 52px;
+
+    border: 1px solid rgba(255,255,255,.08);
+
+    background: rgba(255,255,255,.04);
+
+    border-radius: 14px;
+
+    outline: none;
+
+    color: white;
+
+    font-size: 0.95rem;
+
+    transition: 0.3s ease;
+
+    &:focus {
+      border-color: $primary-purple;
+
+      box-shadow:
+        0 0 20px rgba(157,92,255,.25);
+    }
+
+    &::placeholder {
+      color: $text-muted;
+    }
+  }
+}
+
+.loginBtn {
+  height: 58px;
+
+  border: none;
+
+  border-radius: 16px;
+
+  background: linear-gradient(
+    135deg,
+    #C78DFF,
+    #8F4FFF
+  );
+
+  color: white;
+
+  font-size: 1rem;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  margin-top: 10px;
+
+  transition: 0.3s ease;
+
+  box-shadow:
+    0 10px 25px rgba(150,80,255,.25);
+
+  &:hover {
+    transform: translateY(-3px) scale(1.02);
+  }
+}
+
+.bottomText {
+  margin-top: 28px;
+
+  color: $text-muted;
+
+  span {
+    color: $primary-purple;
+    cursor: pointer;
+    font-weight: 600;
+  }
+}

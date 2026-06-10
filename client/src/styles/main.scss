@@ -1,0 +1,91 @@
+@import "./abstracts/variables";
+@import "./abstracts/mixins";
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body {
+	background: var(--bg-primary);
+	color: var(--text-primary);
+	font-family: "Inter", sans-serif;
+}
+
+:root {
+	--bg-primary: #030B2E;
+	--card-bg: #101B47;
+	--secondary-bg: #172559;
+
+	--primary-purple: #9D5CFF;
+	--secondary-purple: #C17BFF;
+	--pink: #D38CFF;
+
+	--text-primary: #FFFFFF;
+	--text-muted: #8E94A8;
+
+  --border-color: rgba(255,255,255,.08);
+  --input-bg: rgba(255,255,255,.04);
+  --sidebar-bg: rgba(20,30,70,.75);
+  --navbar-bg: rgba(20,30,70,.6);
+  --card-shadow: 0 20px 60px rgba(0,0,0,.35);
+}
+
+/* Light theme overrides */
+.light-theme {
+
+	/* MAIN BACKGROUNDS */
+
+	--bg-primary: #F5F7FF;
+
+	--bg-secondary: #FFFFFF;
+
+	--card-bg: rgba(255,255,255,.92);
+
+	/* TEXT */
+
+	--text-primary: #101B47;
+
+	--text-muted: #5B6480;
+
+	/* BORDERS */
+
+	--border-color: rgba(16,27,71,.08);
+
+	/* INPUTS */
+
+	--input-bg: rgba(16,27,71,.03);
+
+	/* SIDEBAR */
+
+	--sidebar-bg: rgba(255,255,255,.88);
+
+	/* NAVBAR */
+
+	--navbar-bg: rgba(255,255,255,.9);
+
+	/* SHADOWS */
+
+	--card-shadow: 0 15px 40px rgba(15,23,42,.08);
+}
+
+/* alias class name compatibility: some code uses .light-theme */
+.light-theme {
+	--bg-primary: #F6F8FB;
+	--card-bg: #FFFFFF;
+	--secondary-bg: #F0F3F8;
+
+	--text-primary: #0B1530;
+	--text-muted: #6B7280;
+}
+
+/* Dark theme defaults (explicit class useful for initial state) */
+.theme-dark {
+	--bg-primary: #030B2E;
+	--card-bg: #101B47;
+	--secondary-bg: #172559;
+
+	--text-primary: #FFFFFF;
+	--text-muted: #8E94A8;
+}

@@ -1,0 +1,72 @@
+@import "../../../styles/abstracts/variables";
+@import "../../../styles/abstracts/mixins";
+
+.empty {
+  @include glassCard;
+
+  padding: 70px 40px;
+
+  text-align: center;
+
+  margin-top: 20px;
+}
+
+.icon {
+  width: 110px;
+  height: 110px;
+
+  margin: auto;
+  margin-bottom: 30px;
+
+  border-radius: 50%;
+
+  background: linear-gradient(135deg, #C78DFF, #8F4FFF);
+
+  @include flexCenter;
+
+  font-size: 2.5rem;
+
+  box-shadow: 0 15px 35px rgba(150,80,255,.3);
+}
+
+h2 {
+  font-size: 2rem;
+
+  margin-bottom: 16px;
+}
+
+p {
+  color: var(--text-muted);
+
+  max-width: 450px;
+
+  margin: auto;
+
+  line-height: 1.7;
+
+  margin-bottom: 30px;
+}
+
+button {
+  height: 56px;
+
+  padding: 0 28px;
+
+  border: none;
+
+  border-radius: 16px;
+
+  background: linear-gradient(135deg, #C78DFF, #8F4FFF);
+
+  color: var(--text-primary);
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: .3s ease;
+
+  &:hover {
+    transform: translateY(-3px);
+  }
+}

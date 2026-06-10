@@ -1,0 +1,19 @@
+@import "../../../styles/abstracts/mixins";
+@import "../../../styles/abstracts/variables";
+
+.authPage {
+  min-height: 100vh;
+
+  position: relative;
+
+  overflow: hidden;
+
+  background: $bg-primary;
+
+  @include flexCenter;
+}
+
+.authContainer {
+  position: relative;
+  z-index: 2;
+}

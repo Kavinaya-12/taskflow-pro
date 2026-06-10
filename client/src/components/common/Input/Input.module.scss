@@ -1,0 +1,49 @@
+@import "../../../styles/abstracts/variables";
+
+.inputGroup {
+  position: relative;
+
+  .icon {
+    position: absolute;
+
+    left: 18px;
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    color: var(--text-muted);
+
+    font-size: 1.1rem;
+  }
+
+  input {
+    width: 100%;
+    height: 58px;
+
+    padding-left: 52px;
+
+    border: 1px solid rgba(255,255,255,.08);
+
+    background: rgba(255,255,255,.04);
+
+    border-radius: 14px;
+
+    outline: none;
+
+    color: var(--text-primary);
+
+    font-size: 0.95rem;
+
+    transition: 0.3s ease;
+
+    &:focus {
+      border-color: $primary-purple;
+
+      box-shadow: 0 0 20px rgba(157,92,255,.25);
+    }
+
+    &::placeholder {
+      color: var(--text-muted);
+    }
+  }
+}

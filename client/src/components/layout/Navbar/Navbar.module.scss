@@ -1,0 +1,146 @@
+@import "../../../styles/abstracts/variables";
+@import "../../../styles/abstracts/mixins";
+
+.navbar {
+  height: 95px;
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 28px;
+  background: rgba(15,23,70,.88);
+  border: 1px solid rgba(255,255,255,.05);
+  backdrop-filter: blur(18px);
+  margin-bottom: 30px;
+}
+.left {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.left h2 {
+  font-size: 2.8rem;
+  font-weight: 800;
+  line-height: 1;
+  margin: 0;
+  letter-spacing: -2px;
+  background: linear-gradient(
+    135deg,
+    #ffffff,
+    #b892ff
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.left p {
+  margin-top: 10px;
+  margin-left: 6px;
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: rgba(255,255,255,.58);
+  letter-spacing: .3px;
+}
+
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.notification,
+.logout {
+  width: 52px;
+  height: 52px;
+
+  border: none;
+
+  border-radius: 16px;
+
+  background: rgba(255,255,255,.05);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  transition: .3s ease;
+
+  &:hover {
+    transform: translateY(-3px);
+    background: rgba(255,255,255,.08);
+  }
+
+  svg {
+    color: var(--text-primary);
+    font-size: 1.2rem;
+    stroke-width: 2.2;
+    display: block;
+    flex-shrink: 0;
+  }
+}
+
+.notification:hover svg {
+  color: #C78DFF;
+}
+
+.logout:hover svg {
+  color: #EF4444;
+}
+
+/* Force navbar svg visibility and sizing to bypass parent conflicts */
+.notification svg,
+.logout svg {
+  width: 22px !important;
+  height: 22px !important;
+  color: #FFFFFF !important;
+  stroke: #FFFFFF !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+}
+
+.profile {
+  height: 52px;
+
+  padding: 0 18px;
+
+  border-radius: 18px;
+
+  background: rgba(255,255,255,.04);
+
+  border: 1px solid rgba(255,255,255,.05);
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+
+  border-radius: 14px;
+
+  background: linear-gradient(135deg, #C78DFF, #8F4FFF);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.profile h4 {
+  font-size: .95rem;
+  margin-bottom: 2px;
+}
+
+.profile span {
+  color: var(--text-muted);
+  font-size: .8rem;
+}

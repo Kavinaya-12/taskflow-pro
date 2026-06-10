@@ -1,0 +1,115 @@
+@import "../../../styles/abstracts/variables";
+
+.backgroundWrapper {
+  position: absolute;
+  inset: 0;
+
+  overflow: hidden;
+
+  z-index: 0;
+}
+
+.orbOne,
+.orbTwo {
+  position: absolute;
+
+  border-radius: 50%;
+
+  filter: blur(120px);
+
+  animation: floatOrb 10s ease-in-out infinite;
+}
+
+.orbOne {
+  width: 450px;
+  height: 450px;
+
+  background: rgba(157,92,255,.22);
+
+  top: -120px;
+  left: -100px;
+}
+
+.orbTwo {
+  width: 380px;
+  height: 380px;
+
+  background: rgba(47,128,237,.16);
+
+  bottom: -100px;
+  right: -100px;
+
+  animation-delay: 2s;
+}
+
+.mesh {
+  position: absolute;
+  inset: 0;
+
+  background-image:
+    linear-gradient(
+      rgba(255,255,255,.03) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(255,255,255,.03) 1px,
+      transparent 1px
+    );
+
+  background-size: 120px 120px;
+
+  mask-image: radial-gradient(
+    circle at center,
+    black,
+    transparent 80%
+  );
+
+  opacity: .18;
+}
+
+.particles {
+  position: absolute;
+  inset: 0;
+}
+
+.particle {
+  position: absolute;
+
+  width: 3px;
+  height: 3px;
+
+  border-radius: 50%;
+
+  background: rgba(255,255,255,.4);
+
+  animation: particleFloat 8s linear infinite;
+}
+
+@keyframes floatOrb {
+  0% {
+    transform: translateY(0px) translateX(0px);
+  }
+
+  50% {
+    transform: translateY(30px) translateX(20px);
+  }
+
+  100% {
+    transform: translateY(0px) translateX(0px);
+  }
+}
+
+@keyframes particleFloat {
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-20px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
+}
