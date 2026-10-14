@@ -1,49 +1,14 @@
-@import "../../../styles/abstracts/variables";
-
-.inputGroup {
-  position: relative;
-
-  .icon {
-    position: absolute;
-
-    left: 18px;
-    top: 50%;
-
-    transform: translateY(-50%);
-
-    color: var(--text-muted);
-
-    font-size: 1.1rem;
-  }
-
-  input {
-    width: 100%;
-    height: 58px;
-
-    padding-left: 52px;
-
-    border: 1px solid rgba(255,255,255,.08);
-
-    background: rgba(255,255,255,.04);
-
-    border-radius: 14px;
-
-    outline: none;
-
-    color: var(--text-primary);
-
-    font-size: 0.95rem;
-
-    transition: 0.3s ease;
-
-    &:focus {
-      border-color: $primary-purple;
-
-      box-shadow: 0 0 20px rgba(157,92,255,.25);
-    }
-
-    &::placeholder {
-      color: var(--text-muted);
-    }
-  }
-}
+.field { display: flex; width: 100%; flex-direction: column; gap: 7px; }
+.label { color: var(--text); font-size: .75rem; font-weight: 750; }
+.inputGroup { position: relative; display: flex; align-items: center; }
+.icon { position: absolute; top: 50%; left: 15px; transform: translateY(-50%); color: var(--accent-strong); font-size: 1rem; pointer-events: none; }
+.inputGroup input { width: 100%; height: 51px; padding: 0 15px 0 44px; border: 1px solid var(--border); border-radius: 12px; background: var(--bg); color: var(--text); outline: 0; font-family: var(--font-body); font-size: .84rem; transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease), background var(--dur) var(--ease); }
+.inputGroup input::placeholder { color: var(--text-muted); opacity: .8; }
+.inputGroup input:focus { border-color: var(--accent-strong); background: var(--surface); box-shadow: 0 0 0 3px var(--accent-softer); }
+.inputGroup.hasError input { border-color: var(--danger); }
+.inputGroup.hasError input:focus { box-shadow: 0 0 0 3px var(--danger-soft); }
+.inputGroup:has(.reveal) input { padding-right: 48px; }
+.reveal { position: absolute; right: 8px; display: flex; width: 34px; height: 34px; align-items: center; justify-content: center; border: 0; border-radius: var(--radius-sm); background: transparent; color: var(--text-muted); cursor: pointer; font-size: 1.05rem; transition: color var(--dur) var(--ease), background var(--dur) var(--ease); }
+.reveal:hover { background: var(--accent-softer); color: var(--accent-strong); }
+.error { margin: 0; color: var(--danger); font-size: .72rem; font-weight: 700; }
+.hint { margin: 0; color: var(--text-muted); font-size: .72rem; }

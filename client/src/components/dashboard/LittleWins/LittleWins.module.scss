@@ -1,0 +1,49 @@
+.layer {
+  position: fixed;
+  z-index: 70;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.confetti {
+  position: absolute;
+  top: 18%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.piece {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+  opacity: 0;
+  animation: fall 1400ms var(--ease) forwards;
+  animation-delay: calc(var(--i) * 40ms);
+}
+.p0, .p3 { background: var(--accent); }
+.p1, .p4 { background: var(--pink); }
+.p2, .p5 { background: var(--orange); }
+
+@keyframes fall {
+  0% { opacity: 0; transform: translate(0, 0) rotate(0deg); }
+  15% { opacity: 1; }
+  100% { opacity: 0; transform: translate(calc((var(--i) - 5) * 16px), 220px) rotate(220deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .layer { display: none; }
+}
+
+.announcer {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

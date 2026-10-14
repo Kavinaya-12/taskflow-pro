@@ -1,6 +1,5 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import './index.css'
 import App from './App.jsx'
 import './styles/main.scss'
 
@@ -14,15 +13,27 @@ createRoot(document.getElementById('root')).render(
     <AuthProvider>
       <TaskProvider>
         <App />
-        <ToastContainer position="top-right" />
+        <ToastContainer
+          position="top-right"
+          autoClose={2600}
+          hideProgressBar={false}
+          newestOnTop
+          closeOnClick
+          pauseOnFocusLoss
+          draggable={false}
+          theme="colored"
+          toastClassName="taskflow-toast"
+        />
       </TaskProvider>
     </AuthProvider>
   </StrictMode>
 )
 
-// Apply saved theme on startup
 try {
-  const saved = localStorage.getItem('theme')
-  if (saved === 'light') document.documentElement.classList.add('theme-light')
-  else document.documentElement.classList.add('theme-dark')
-} catch (e) {}
+  const currentUser = JSON.parse(localStorage.getItem('user') || 'null')
+  const saved = localStorage.getItem(`theme-${currentUser?.email}`) ?? localStorage.getItem('theme')
+  document.documentElement.classList.toggle('theme-dark', saved === 'dark')
+  document.documentElement.classList.toggle('light-theme', saved !== 'dark')
+} catch {
+  document.documentElement.classList.add('light-theme')
+}

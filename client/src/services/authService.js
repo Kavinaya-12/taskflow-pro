@@ -1,11 +1,9 @@
-import axios from "axios";
-
-const API_URL="http://localhost:5000/api/auth";
+import api from './api'
 
 export const registerUser=async(userData)=>{
 
-const response=await axios.post(
-`${API_URL}/register`,
+const response=await api.post(
+'/auth/register',
 userData
 );
 
@@ -22,8 +20,8 @@ return response.data;
 
 export const loginUser=async(userData)=>{
 
-const response=await axios.post(
-`${API_URL}/login`,
+const response=await api.post(
+'/auth/login',
 userData
 );
 
@@ -40,13 +38,11 @@ return response.data;
 
 export const deleteAccount=async()=>{
 
-const token=JSON.parse(
-localStorage.getItem("user")
-)?.token;
+const token=JSON.parse(localStorage.getItem("user") || 'null')?.token;
 
 const response=
-await axios.delete(
-`${API_URL}/delete-account`,
+await api.delete(
+'/auth/delete-account',
 {
 headers:{
 Authorization:
@@ -60,13 +56,11 @@ return response.data;
 
 export const updatePassword=async(passwordData)=>{
 
-const token=JSON.parse(
-localStorage.getItem("user")
-)?.token;
+const token=JSON.parse(localStorage.getItem("user") || 'null')?.token;
 
 const response=
-await axios.put(
-`${API_URL}/update-password`,
+await api.put(
+'/auth/update-password',
 passwordData,
 {
 headers:{
@@ -76,5 +70,25 @@ Authorization:
 }
 );
 
+if(response.data.token){
+const current=JSON.parse(localStorage.getItem('user') || 'null') || {};
+localStorage.setItem('user',JSON.stringify({...current,token:response.data.token}));
+}
+
 return response.data;
 };
+
+export const logoutUser=async(token)=>{
+const response=await api.post('/auth/logout',{}, {
+headers:{Authorization:`Bearer ${token}`},
+});
+return response.data;
+};
+
+export const updateProfile = async (profileData) => {
+  const token = JSON.parse(localStorage.getItem('user') || 'null')?.token
+  const response = await api.put('/auth/profile', profileData, {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  return response.data
+}

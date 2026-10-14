@@ -1,17 +1,17 @@
-import React,{useState,useEffect} from "react";
+import {useState,useEffect} from "react";
 import styles from "./Settings.module.scss";
 import {FiUser,FiLock,FiBell,FiTrash2,FiLogOut,FiSave} from "react-icons/fi";
 import {toast} from "react-toastify";
-import {useAuth} from "../../context/AuthContext";
-import {deleteAccount,updatePassword} from "../../services/authService";
+import {useAuth} from "../../context/useAuth";
+import {deleteAccount,updatePassword,updateProfile} from "../../services/authService";
 
 const Settings=()=>{
 
-const {user,logout}=useAuth();
+const {user,logout,updateUser}=useAuth();
 
 const [profile,setProfile]=useState({
-name:user?.name||"Kavinaya",
-email:user?.email||"kavinaya@gmail.com",
+name:user?.name||"",
+email:user?.email||"",
 });
 
 const [passwords,setPasswords]=useState({
@@ -30,10 +30,10 @@ return true;
 })(),
 darkMode:(()=>{
 try{
-const value=localStorage.getItem(`theme-${user?.email}`);
-return value===null?true:value==="true";
+const value=localStorage.getItem(`theme-${user?.email}`) ?? localStorage.getItem("theme");
+return value==="dark";
 }catch{
-return true;
+return false;
 }
 })(),
 });
@@ -51,15 +51,17 @@ parts[1].charAt(0)
 };
 
 useEffect(()=>{
-if(preferences.darkMode){
-document.body.classList.remove("light-theme");
-}else{
-document.body.classList.add("light-theme");
+document.documentElement.classList.toggle("light-theme",!preferences.darkMode);
+document.documentElement.classList.toggle("theme-dark",preferences.darkMode);
+try {
+localStorage.setItem("theme",preferences.darkMode?"dark":"light");
+localStorage.setItem(`theme-${user?.email}`,preferences.darkMode?"dark":"light");
+} catch (error) {
+void error;
 }
-localStorage.setItem(`theme-${profile.email}`,preferences.darkMode);
-},[preferences.darkMode,profile.email]);
+},[preferences.darkMode,user?.email]);
 
-const handleSaveProfile=()=>{
+const handleSaveProfile=async()=>{
 
 if(!profile.name||!profile.email){
 toast.error("All fields are required");
@@ -74,16 +76,9 @@ return;
 }
 
 try{
-const stored=JSON.parse(localStorage.getItem("user"))||{};
-
-const updated={
-...stored,
-name:profile.name,
-email:profile.email,
-};
-
-localStorage.setItem("user",JSON.stringify(updated));
-
+const updated=await updateProfile(profile);
+updateUser(updated);
+setProfile({name:updated.name,email:updated.email});
 toast.success("Profile updated successfully");
 
 }catch{
@@ -105,10 +100,11 @@ return;
 
 try{
 
-await updatePassword({
+const passwordResult=await updatePassword({
 currentPassword:passwords.current,
 newPassword:passwords.newPass,
 });
+if(passwordResult.token) updateUser({token:passwordResult.token});
 
 setPasswords({
 current:"",
@@ -128,56 +124,32 @@ error.response?.data?.message||
 
 const toggleNotifications=()=>{
 
-const updated={
-...preferences,
-notifications:!preferences.notifications,
-};
-
-setPreferences(updated);
-
-localStorage.setItem(
-`notifications-${profile.email}`,
-updated.notifications
-);
-
-toast.success(
-updated.notifications
-?"Notifications enabled"
-:"Notifications disabled"
-);
+const nextEnabled = !preferences.notifications;
+setPreferences((current)=>({...current,notifications:nextEnabled}));
+try { localStorage.setItem(`notifications-${user?.email}`, nextEnabled); } catch (error) { void error; }
+toast.success(nextEnabled ? "Notifications enabled" : "Notifications disabled");
 };
 
 const toggleDarkMode=()=>{
-
-setPreferences({
-...preferences,
-darkMode:!preferences.darkMode,
-});
-
-toast.success(
-preferences.darkMode
-?"Light mode enabled"
-:"Dark mode enabled"
-);
+const nextDarkMode = !preferences.darkMode;
+setPreferences((current)=>({...current,darkMode:nextDarkMode}));
+toast.success(nextDarkMode ? "Dark mode enabled" : "Light mode enabled");
 };
+
+const [confirmDelete,setConfirmDelete]=useState(false);
+const [deleting,setDeleting]=useState(false);
 
 const handleDelete=async()=>{
 
-const confirmDelete=window.confirm(
-"Delete account permanently?"
-);
-
-if(!confirmDelete) return;
-
 try{
-
+setDeleting(true);
 await deleteAccount();
 
 toast.success(
 "Account deleted successfully"
 );
 
-logout();
+logout({revoke:false});
 
 }catch(error){
 
@@ -185,16 +157,13 @@ toast.error(
 error.response?.data?.message||
 "Failed to delete account"
 );
+setDeleting(false);
+setConfirmDelete(false);
 }
 };
 
 return(
 <div className={styles.settings}>
-
-<div className={styles.header}>
-<h1>Settings</h1>
-<p>Manage your account preferences</p>
-</div>
 
 <div className={styles.card}>
 
@@ -204,9 +173,12 @@ return(
 </div>
 
 <div className={styles.formGroup}>
-<label>Full Name</label>
+<label htmlFor="settings-name">Full Name</label>
 
 <input
+id="settings-name"
+autoComplete="name"
+maxLength={100}
 value={profile.name}
 onChange={(e)=>
 setProfile({
@@ -218,9 +190,12 @@ name:e.target.value,
 </div>
 
 <div className={styles.formGroup}>
-<label>Email Address</label>
+<label htmlFor="settings-email">Email Address</label>
 
 <input
+id="settings-email"
+type="email"
+autoComplete="email"
 value={profile.email}
 onChange={(e)=>
 setProfile({
@@ -234,6 +209,7 @@ email:e.target.value,
 <div className={styles.profileBottom}>
 
 <button
+type="button"
 className={styles.saveBtn}
 onClick={handleSaveProfile}
 >
@@ -273,10 +249,12 @@ Secured
 </div>
 
 <div className={styles.formGroup}>
-<label>Current Password</label>
+<label htmlFor="settings-current-password">Current Password</label>
 
 <input
+id="settings-current-password"
 type="password"
+autoComplete="current-password"
 placeholder="Enter current password"
 value={passwords.current}
 onChange={(e)=>
@@ -289,10 +267,12 @@ current:e.target.value,
 </div>
 
 <div className={styles.formGroup}>
-<label>New Password</label>
+<label htmlFor="settings-new-password">New Password</label>
 
 <input
+id="settings-new-password"
 type="password"
+autoComplete="new-password"
 placeholder="Create strong password"
 value={passwords.newPass}
 onChange={(e)=>
@@ -311,6 +291,7 @@ newPass:e.target.value,
 </div>
 
 <button
+type="button"
 className={styles.saveBtn}
 onClick={handleUpdatePassword}
 >
@@ -335,6 +316,7 @@ Update Password
 </div>
 
 <button
+type="button"
 onClick={toggleNotifications}
 className={
 preferences.notifications
@@ -359,6 +341,7 @@ preferences.notifications
 </div>
 
 <button
+type="button"
 onClick={toggleDarkMode}
 className={
 preferences.darkMode
@@ -386,6 +369,7 @@ preferences.darkMode
 <div className={styles.accountActions}>
 
 <button
+type="button"
 className={styles.saveBtn}
 onClick={logout}
 >
@@ -393,13 +377,39 @@ onClick={logout}
 Logout
 </button>
 
+{confirmDelete ? (
+<div className={styles.confirmBox} role="alertdialog" aria-labelledby="confirm-delete-title">
+<p id="confirm-delete-title"><strong>Delete your account?</strong> This permanently removes your account and all tasks. This cannot be undone.</p>
+<div className={styles.confirmActions}>
 <button
+type="button"
+className={styles.ghostBtn}
+onClick={()=>setConfirmDelete(false)}
+disabled={deleting}
+>
+Keep my account
+</button>
+<button
+type="button"
 className={styles.deleteBtn}
 onClick={handleDelete}
+disabled={deleting}
+>
+<FiTrash2 />
+{deleting ? "Deleting…" : "Yes, delete it"}
+</button>
+</div>
+</div>
+) : (
+<button
+type="button"
+className={styles.deleteBtn}
+onClick={()=>setConfirmDelete(true)}
 >
 <FiTrash2 />
 Delete Account
 </button>
+)}
 
 </div>
 </div>

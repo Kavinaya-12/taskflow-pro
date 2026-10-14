@@ -4,7 +4,6 @@ import {
   FiMail,
   FiLock,
   FiArrowRight,
-  FiLayers
 } from "react-icons/fi";
 
 import { motion } from "framer-motion";
@@ -19,82 +18,45 @@ import {
   useNavigate
 } from "react-router-dom";
 
-import { useAuth }
-from "../../context/AuthContext";
+import { useAuth } from "../../context/useAuth";
+import { toast } from "react-toastify";
 
-import { toast }
-from "react-toastify";
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const Login = () => {
 
-  const [email, setEmail] =
-    useState("")
-
-  const [password, setPassword] =
-    useState("")
-
-  const [loading, setLoading] =
-    useState(false)
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [errors, setErrors] = useState({})
+  const [loading, setLoading] = useState(false)
 
   const { login } = useAuth()
-
   const navigate = useNavigate()
 
+  const validate = () => {
+    const next = {}
+    if (!email.trim()) next.email = "Email is required"
+    else if (!EMAIL_REGEX.test(email.trim())) next.email = "Enter a valid email address"
+    if (!password) next.password = "Password is required"
+    setErrors(next)
+    return Object.keys(next).length === 0
+  }
+
   const handleSubmit = async (e) => {
-
     e.preventDefault()
-
-    // EMPTY VALIDATION
-
-    if (!email || !password) {
-
-      toast.error(
-        "Please fill all fields"
-      )
-
-      return
-    }
-
-    // EMAIL VALIDATION
-
-    const emailRegex =
-      /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-
-    if (
-      !emailRegex.test(email)
-    ) {
-
-      toast.error(
-        "Invalid email format"
-      )
-
-      return
-    }
+    if (!validate()) return
 
     try {
-
       setLoading(true)
-
-      await login({
-        email,
-        password
-      })
-
-      toast.success(
-        'Login successful'
-      )
-
+      setErrors({})
+      await login({ email: email.trim(), password })
+      toast.success("Welcome back")
       navigate('/dashboard')
-
     } catch (error) {
-
-      toast.error(
-        error.response?.data?.message ||
-        'Invalid credentials'
-      )
-
+      const message = error.response?.data?.message || "We couldn't sign you in. Please try again."
+      setErrors({ form: message })
+      toast.error(message)
     } finally {
-
       setLoading(false)
     }
   }
@@ -105,75 +67,65 @@ const Login = () => {
 
       <motion.div
         className={styles.loginCard}
-        initial={{ opacity: 0, y: 40 }}
+        initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7 }}
+        transition={{ duration: 0.6, ease: [0.22, 0.61, 0.36, 1] }}
       >
 
         <div className={styles.logoSection}>
-
-          <div className={styles.logoIcon}>
-            <FiLayers />
-          </div>
-
-          <h1>
-            TaskFlow <span>Pro</span>
-          </h1>
-
-          <p>
-            Welcome back,
-            sign in to continue
-          </p>
-
+          <span className={styles.eyebrow}>Your work, in good hands</span>
+          <h1>Welcome back.</h1>
+          <p>Sign in and pick up right where you left off.</p>
         </div>
 
         <form
           className={styles.form}
           onSubmit={handleSubmit}
+          noValidate
         >
+          {errors.form && (
+            <p className={styles.formError} role="alert">{errors.form}</p>
+          )}
 
           <Input
-            placeholder="Enter your email"
+            label="Email address"
+            name="email"
+            type="email"
+            autoComplete="email"
+            required
+            placeholder="you@example.com"
             value={email}
-            onChange={(e) =>
-              setEmail(e.target.value)
-            }
+            onChange={(e) => setEmail(e.target.value)}
+            error={errors.email}
             icon={FiMail}
           />
 
           <Input
+            label="Password"
+            name="password"
             type="password"
+            autoComplete="current-password"
+            required
             placeholder="Enter your password"
             value={password}
-            onChange={(e) =>
-              setPassword(e.target.value)
-            }
+            onChange={(e) => setPassword(e.target.value)}
+            error={errors.password}
             icon={FiLock}
           />
 
           <Button
             type="submit"
+            disabled={loading}
+            fullWidth
             icon={<FiArrowRight />}
           >
-
-            {
-              loading
-                ? "Signing In..."
-                : "Sign In"
-            }
-
+            {loading ? "Signing in…" : "Sign In"}
           </Button>
-
         </form>
 
         <div className={styles.bottomText}>
-
-          Don’t have an account?
-
-          <Link to="/register">
-            Create one
-          </Link>
-
+          New to Taskflow?
+          <Link to="/register">Create an account</Link>
         </div>
 
       </motion.div>

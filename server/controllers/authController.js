@@ -1,130 +1,97 @@
 const asyncHandler = require('express-async-handler')
 const bcrypt = require('bcryptjs')
 const User = require('../models/User')
+const Task = require('../models/Task')
 const generateToken = require('../utils/generateToken')
 
+const normalizeEmail = (value) => typeof value === 'string' ? value.trim().toLowerCase() : ''
+const validEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+const emailQuery = (email) => ({ $regex: `^${email.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, $options: 'i' })
+
 const registerUser = asyncHandler(async (req, res) => {
-  const { name, email, password } = req.body
-  if (!name || !email || !password) {
+  const name = typeof req.body.name === 'string' ? req.body.name.trim() : ''
+  const email = normalizeEmail(req.body.email)
+  const { password } = req.body
+  if (!name || name.length > 100 || !validEmail(email) || email.length > 254 || typeof password !== 'string' || password.length < 6 || Buffer.byteLength(password, 'utf8') > 72) {
     res.status(400)
-    throw new Error('Please fill all fields')
+    throw new Error('Provide a name (100 characters max), valid email, and password of 6 to 72 UTF-8 bytes')
   }
-  const userExists = await User.findOne({ email })
-  if (userExists) {
-    res.status(400)
+  if (await User.findOne({ email: emailQuery(email) })) {
+    res.status(409)
     throw new Error('User already exists')
   }
-  const salt = await bcrypt.genSalt(10)
-  const hashedPassword = await bcrypt.hash(password, salt)
-  const user = await User.create({
-    name,
-    email,
-    password: hashedPassword,
-  })
-  if (user) {
-    res.status(201).json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      token: generateToken(user._id),
-    })
-  } else {
-    res.status(400)
-    throw new Error('Invalid user data')
-  }
+  const user = await User.create({ name, email, password: await bcrypt.hash(password, 10) })
+  res.status(201).json({ _id: user._id, name: user.name, email: user.email, token: generateToken(user._id, user.tokenVersion) })
 })
 
 const loginUser = asyncHandler(async (req, res) => {
-  const { email, password } = req.body
-
-  const user = await User.findOne({ email })
-
-  if (user && (await bcrypt.compare(password, user.password))) {
-    res.json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      token: generateToken(user._id),
-    })
-  } else {
+  const email = normalizeEmail(req.body.email)
+  const { password } = req.body
+  const user = validEmail(email) && email.length <= 254 && typeof password === 'string' && Buffer.byteLength(password, 'utf8') <= 72 ? await User.findOne({ email: emailQuery(email) }) : null
+  if (!user || !(await bcrypt.compare(password, user.password))) {
     res.status(401)
     throw new Error('Invalid email or password')
   }
+  res.json({ _id: user._id, name: user.name, email: user.email, token: generateToken(user._id, user.tokenVersion) })
 })
 
-const getMe = asyncHandler(async (req, res) => {
-  res.status(200).json(req.user)
+const getMe = asyncHandler(async (req, res) => res.status(200).json({
+  _id: req.user._id,
+  name: req.user.name,
+  email: req.user.email,
+  createdAt: req.user.createdAt,
+  updatedAt: req.user.updatedAt,
+}))
+
+const deleteAccount = asyncHandler(async (req, res) => {
+  const session = await User.db.startSession()
+  try {
+    await session.withTransaction(async () => {
+      await Task.deleteMany({ user: req.user._id }, { session })
+      await User.findByIdAndDelete(req.user._id, { session })
+    })
+    res.status(200).json({ message: 'Account deleted successfully' })
+  } finally {
+    await session.endSession()
+  }
 })
 
-const deleteAccount = async (
-  req,
-  res
-) => {
-  try {
-    await User.findByIdAndDelete(
-      req.user.id
-    )
-    res.status(200).json({
-      message:
-        "Account deleted successfully"
-    })
-  } catch (error) {
-    res.status(500).json({
-      message:
-        "Server error"
-    })
+const updatePassword = asyncHandler(async (req, res) => {
+  const { currentPassword, newPassword } = req.body
+  if (typeof currentPassword !== 'string' || Buffer.byteLength(currentPassword, 'utf8') > 72 || typeof newPassword !== 'string' || newPassword.length < 6 || Buffer.byteLength(newPassword, 'utf8') > 72) {
+    res.status(400)
+    throw new Error('Provide the current password and a new password of 6 to 72 UTF-8 bytes')
   }
-}
-
-
-const updatePassword = async (req, res) => {
-  try {
-    const { currentPassword, newPassword } = req.body;
-
-    const user = await User.findById(req.user.id);
-
-    if (!user) {
-      return res.status(404).json({
-        message: "User not found",
-      });
-    }
-
-    const isMatch = await bcrypt.compare(
-      currentPassword,
-      user.password
-    );
-
-    if (!isMatch) {
-      return res.status(400).json({
-        message: "Current password is incorrect",
-      });
-    }
-
-    const salt = await bcrypt.genSalt(10);
-
-    user.password = await bcrypt.hash(
-      newPassword,
-      salt
-    );
-
-    await user.save();
-
-    res.status(200).json({
-      message: "Password updated successfully",
-    });
-
-  } catch (error) {
-
-    res.status(500).json({
-      message: "Server error",
-    });
+  const user = await User.findById(req.user._id)
+  if (!(await bcrypt.compare(currentPassword, user.password))) {
+    res.status(400)
+    throw new Error('Current password is incorrect')
   }
-};
+  user.password = await bcrypt.hash(newPassword, 10)
+  user.tokenVersion = (user.tokenVersion || 0) + 1
+  await user.save()
+  res.status(200).json({ message: 'Password updated successfully', token: generateToken(user._id, user.tokenVersion) })
+})
 
-module.exports = {
-  registerUser,
-  loginUser,
-  getMe,
-  deleteAccount,
-  updatePassword,
-};
+const logoutUser = asyncHandler(async (req, res) => {
+  await User.findByIdAndUpdate(req.user._id, { tokenVersion: (req.user.tokenVersion || 0) + 1 })
+  res.status(200).json({ message: 'Logged out successfully' })
+})
+
+const updateProfile = asyncHandler(async (req, res) => {
+  const name = typeof req.body.name === 'string' ? req.body.name.trim() : ''
+  const email = normalizeEmail(req.body.email)
+  if (!name || name.length > 100 || !validEmail(email) || email.length > 254) {
+    res.status(400)
+    throw new Error('Provide a valid name and email')
+  }
+  const duplicate = await User.findOne({ email: emailQuery(email), _id: { $ne: req.user._id } })
+  if (duplicate) {
+    res.status(409)
+    throw new Error('Email is already in use')
+  }
+  const user = await User.findByIdAndUpdate(req.user._id, { name, email }, { new: true, runValidators: true }).select('-password -tokenVersion')
+  res.status(200).json(user)
+})
+
+module.exports = { registerUser, loginUser, getMe, deleteAccount, updatePassword, logoutUser, updateProfile }

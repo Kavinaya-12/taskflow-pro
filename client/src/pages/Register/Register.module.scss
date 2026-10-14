@@ -1,69 +1,10 @@
-@import "../../styles/abstracts/variables";
-@import "../../styles/abstracts/mixins";
-
-.registerCard {
-  width: 430px;
-
-  padding: 45px;
-
-  @include glassCard;
-
-  text-align: center;
-}
-
-.logoSection {
-  margin-bottom: 35px;
-
-  .logoIcon {
-    width: 85px;
-    height: 85px;
-
-    margin: auto;
-    margin-bottom: 20px;
-
-    border-radius: 24px;
-
-    background: linear-gradient(135deg, #C78DFF, #8F4FFF);
-
-    @include flexCenter;
-
-    font-size: 2rem;
-
-    box-shadow: 0 10px 30px rgba(150,80,255,.35);
-  }
-
-  h1 {
-    font-size: 2.3rem;
-    font-weight: 800;
-
-    margin-bottom: 10px;
-  }
-
-  p {
-    color: $text-muted;
-  }
-}
-
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: 22px;
-}
-
-.bottomText {
-  margin-top: 28px;
-
-  color: $text-muted;
-
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-
-  a {
-    color: $primary-purple;
-
-    text-decoration: none;
-
-    font-weight: 600;
-  }
-}
+.registerCard { width: min(420px, 100%); padding: 0; }
+.logoSection { margin-bottom: 27px; text-align: left; }
+.eyebrow { display: inline-block; margin-bottom: 11px; color: var(--accent-strong); font-size: .66rem; font-weight: 800; letter-spacing: .15em; text-transform: uppercase; }
+.logoSection h2 { margin: 0 0 9px; color: var(--text-strong); font-family: var(--font-display); font-size: clamp(2.55rem, 5vw, 3.55rem); font-weight: 400; letter-spacing: -.04em; line-height: .98; }
+.logoSection p { max-width: 37ch; margin: 0; color: var(--text-muted); font-size: .87rem; line-height: 1.6; }
+.form { display: flex; flex-direction: column; gap: 15px; margin-top: 0; }
+.formError { margin: 0; padding: 11px 14px; border: 1px solid color-mix(in srgb, var(--danger) 30%, transparent); border-radius: var(--radius-md); background: var(--danger-soft); color: var(--danger); font-size: .8rem; font-weight: 650; }
+.bottomText { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin-top: 21px; color: var(--text-muted); font-size: .8rem; }
+.bottomText a { color: var(--accent-strong); font-weight: 800; text-decoration: none; }
+.bottomText a:hover { text-decoration: underline; text-underline-offset: 3px; }
